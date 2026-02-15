@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/patient/patient_details.dart';
+import 'core/app_theme.dart';
 
 void main() {
   runApp(const CareNestApp());
