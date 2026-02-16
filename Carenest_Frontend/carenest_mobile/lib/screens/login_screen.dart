@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/app_theme.dart'; // Import the "CSS" file
+import '../core/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // --- LOGO / HEADER ---
+                  // Logo and App Name
                   Image.asset('../assets/images/logo_black.png', height: 100, errorBuilder: (context, error, stack) {
                     // Fallback if logo isn't added yet
                     return const Icon(Icons.favorite, size: 80, color: AppTheme.primaryDark);
@@ -59,16 +59,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     "Welcome Back",
                     textAlign: TextAlign.center,
-                    style: AppTheme.headingLarge, // Uses your Poppins Bold
+                    style: AppTheme.headingLarge, // Uses Poppins Bold
                   ),
                   Text(
                     "Sign in to continue to CareNest",
                     textAlign: TextAlign.center,
-                    style: AppTheme.bodyText, // Uses your Grey Inter text
+                    style: AppTheme.bodyText, // Uses Grey Inter text
                   ),
                   const SizedBox(height: 40),
 
-                  // --- EMAIL INPUT ---
+                  // Email Input
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // --- PASSWORD INPUT ---
+                  //Password Input
                   TextFormField(
                     controller: _passController,
                     obscureText: _isObscure,
@@ -110,10 +110,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     validator: (value) {
+                      // Basic validation: non-empty and at least 6 characters
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
                       }
                       if (value.length < 6) {
+                        // Validation for minimum password length
                         return 'Password must be at least 6 characters';
                       }
                       return null;
@@ -157,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(
                             color: AppTheme.primary,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins', // Matches your theme font
+                            fontFamily: 'Poppins', // Matches theme font
                           ),
                         ),
                       ),
