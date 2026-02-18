@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/app_theme.dart';
 
 class CaregiverDashboardPage extends StatefulWidget {
   const CaregiverDashboardPage({super.key});
@@ -12,65 +13,48 @@ class CaregiverDashboardPage extends StatefulWidget {
 class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
   int _navIndex = 0;
 
-  // Colors tuned to match the UI
-  static const _bg = Color(0xFFF7FAFA);
-  static const _cardBorder = Color(0xFFE7EEF0);
-  static const _textDark = Color(0xFF0F172A);
-  static const _textSoft = Color(0xFF7A8A96);
-  static const _primary = Color(0xFF16A394);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
           children: [
-            // Header: "Hi, Kavindu" + avatar
+            // Header
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Expanded(
-                  child: Text(
-                    'Hi, Caregiver',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: _textDark,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
+                Expanded(
+                  child: Text('Hi, Caregiver', style: AppTheme.headingLarge),
                 ),
                 const SizedBox(width: 12),
-                // Replace with your real image:
-                // CircleAvatar(backgroundImage: AssetImage('assets/images/avatar.jpg'))
                 const CircleAvatar(
                   radius: 18,
-                  backgroundColor: Color(0xFFE9F3F2),
-                  child: Icon(Icons.person, color: _textSoft, size: 20),
+                  backgroundColor: AppTheme.softGreen,
+                  child: Icon(Icons.person, color: AppTheme.textGrey, size: 20),
                 ),
               ],
             ),
 
             const SizedBox(height: 18),
 
-            // Two stat cards row
+            // Stat cards row
             Row(
-              children: [
+              children: const [
                 Expanded(
                   child: _StatCard(
                     title: "Today's visits",
                     value: '2',
-                    valueColor: _textDark,
+                    valueColor: AppTheme.textDark,
                   ),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Expanded(
                   child: _StatCard(
                     title: 'This month',
                     value: 'LKR 7,500',
-                    valueColor: _primary,
+                    valueColor: AppTheme.primary,
                   ),
                 ),
               ],
@@ -83,18 +67,10 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
 
             const SizedBox(height: 18),
 
-            const Text(
-              'Available jobs near you',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: _textDark,
-              ),
-            ),
+            Text('Available jobs near you', style: AppTheme.headingMedium),
 
             const SizedBox(height: 12),
 
-            // Available job card (first item visible in UI)
             const _JobCard(
               tag: 'HOSPITAL STAY',
               price: 'LKR 3,000',
@@ -103,7 +79,6 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
 
             const SizedBox(height: 12),
 
-            // Optional second card placeholder (your screenshot shows more below)
             const _JobCard(
               tag: 'HOME VISIT',
               price: 'LKR 2,200',
@@ -113,38 +88,38 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
         ),
       ),
 
-      // Bottom nav (Home/Jobs/Messages/Profile)
+      // Bottom nav
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: _cardBorder)),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.12))),
         ),
         child: NavigationBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppTheme.surface,
           elevation: 0,
           height: 70,
           selectedIndex: _navIndex,
           onDestinationSelected: (i) => setState(() => _navIndex = i),
-          indicatorColor: _primary.withOpacity(0.12),
+          indicatorColor: AppTheme.primary.withOpacity(0.12),
           destinations: const [
             NavigationDestination(
               icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home, color: _primary),
+              selectedIcon: Icon(Icons.home, color: AppTheme.primary),
               label: 'Home',
             ),
             NavigationDestination(
               icon: Icon(Icons.list_alt_outlined),
-              selectedIcon: Icon(Icons.list_alt, color: _primary),
+              selectedIcon: Icon(Icons.list_alt, color: AppTheme.primary),
               label: 'Jobs',
             ),
             NavigationDestination(
               icon: Icon(Icons.chat_bubble_outline),
-              selectedIcon: Icon(Icons.chat_bubble, color: _primary),
+              selectedIcon: Icon(Icons.chat_bubble, color: AppTheme.primary),
               label: 'Messages',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person, color: _primary),
+              selectedIcon: Icon(Icons.person, color: AppTheme.primary),
               label: 'Profile',
             ),
           ],
@@ -159,9 +134,6 @@ class _StatCard extends StatelessWidget {
   final String value;
   final Color valueColor;
 
-  static const _cardBorder = Color(0xFFE7EEF0);
-  static const _textSoft = Color(0xFF7A8A96);
-
   const _StatCard({
     required this.title,
     required this.value,
@@ -173,8 +145,8 @@ class _StatCard extends StatelessWidget {
     return Container(
       height: 110,
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: _cardBorder),
+        color: AppTheme.surface,
+        border: Border.all(color: Colors.grey.withOpacity(0.12)),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -190,10 +162,9 @@ class _StatCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 13,
+            style: AppTheme.bodyText.copyWith(
               fontWeight: FontWeight.w700,
-              color: _textSoft,
+              color: AppTheme.textGrey,
             ),
           ),
           const Spacer(),
@@ -213,15 +184,14 @@ class _StatCard extends StatelessWidget {
 }
 
 class _NextVisitCard extends StatelessWidget {
-  static const _primary = Color(0xFF16A394);
-  static const _textSoftOnDark = Color(0xFFA9C2BE);
-
   const _NextVisitCard();
+
+  static const _textSoftOnDark = Color(0xFFA9C2BE);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 185,
+      height: 200, // keep your overflow fix
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
         gradient: const LinearGradient(
@@ -240,7 +210,6 @@ class _NextVisitCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
       child: Stack(
         children: [
-          // Faint clock icon on the right
           Positioned(
             right: -6,
             top: 28,
@@ -250,7 +219,6 @@ class _NextVisitCard extends StatelessWidget {
               color: Colors.white.withOpacity(0.10),
             ),
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -260,12 +228,10 @@ class _NextVisitCard extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.1,
-                  color: _primary.withOpacity(0.85),
+                  color: AppTheme.primary.withOpacity(0.85),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ), //made a change 14->10 (overflowed by 4.0 pixels)
+              const SizedBox(height: 10),
 
               Row(
                 children: [
@@ -316,8 +282,8 @@ class _NextVisitCard extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(
                     Icons.location_on_outlined,
                     size: 18,
@@ -337,24 +303,12 @@ class _NextVisitCard extends StatelessWidget {
 
               const Spacer(),
 
-              // Start visit button
+              // ✅ Let global theme style the button
               SizedBox(
                 width: double.infinity,
-                height: 46,
                 child: ElevatedButton(
                   onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _primary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    'Start visit',
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
-                  ),
+                  child: Text('Start visit', style: AppTheme.buttonText),
                 ),
               ),
             ],
@@ -370,18 +324,14 @@ class _JobCard extends StatelessWidget {
   final String price;
   final String time;
 
-  static const _cardBorder = Color(0xFFE7EEF0);
-  static const _textDark = Color(0xFF0F172A);
-  static const _textSoft = Color(0xFF7A8A96);
-
   const _JobCard({required this.tag, required this.price, required this.time});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: _cardBorder),
+        color: AppTheme.surface,
+        border: Border.all(color: Colors.grey.withOpacity(0.12)),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -395,7 +345,7 @@ class _JobCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tag pill
+          // Tag pill (kept as-is)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
@@ -420,43 +370,35 @@ class _JobCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
-              color: _textDark,
+              color: AppTheme.textDark,
             ),
           ),
           const SizedBox(height: 8),
 
           Row(
             children: [
-              const Icon(Icons.schedule, size: 18, color: _textSoft),
+              const Icon(Icons.schedule, size: 18, color: AppTheme.textGrey),
               const SizedBox(width: 6),
               Text(
                 time,
-                style: const TextStyle(
-                  fontSize: 14,
+                style: AppTheme.bodyText.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: _textSoft,
+                  color: AppTheme.textGrey,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 10), //4 pixels overflow error 14->10
-          // View details button (outlined)
+          const SizedBox(height: 10),
+
+          // ✅ Let global theme style the outlined button
           SizedBox(
             width: double.infinity,
-            height: 42,
             child: OutlinedButton(
               onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                foregroundColor: _textSoft,
-                side: BorderSide(color: _cardBorder.withOpacity(1)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
+              child: Text(
                 'View details',
-                style: TextStyle(fontWeight: FontWeight.w900),
+                style: AppTheme.buttonText.copyWith(color: AppTheme.primary),
               ),
             ),
           ),

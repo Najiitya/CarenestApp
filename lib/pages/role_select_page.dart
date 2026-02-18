@@ -1,25 +1,22 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
+import '../core/app_theme.dart';
 import '../core/role_storage.dart';
 import '../core/user_role.dart';
+
 import 'caregiver_dashboard_page.dart';
 import 'carereceiver_dashboard_page.dart';
 
 class RoleSelectPage extends StatelessWidget {
   const RoleSelectPage({super.key});
 
-  static const routeName = '/';
-
-  // Tune these to your brand
-  static const Color _bg = Color(0xFFF7FAFA);
-  static const Color _primary = Color(0xFF16A394);
-  static const Color _textDark = Color(0xFF0F172A);
-  static const Color _textSoft = Color(0xFF7A8A96);
+  static const routeName = '/role-select';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -33,29 +30,27 @@ class RoleSelectPage extends StatelessWidget {
                 Center(
                   child: Column(
                     children: [
-                      // Replace with your real logo asset path:
-                      // Example: assets/images/carenest_logo.png
                       Image.asset(
                         'assets/images/logo_black.png',
                         height: 62,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stack) {
-                          // If logo isn't added yet, show a neat fallback
                           return const Icon(
                             Icons.favorite,
                             size: 54,
-                            color: _primary,
+                            color: AppTheme.primary,
                           );
                         },
                       ),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         'CARENEST',
-                        style: TextStyle(
+                        style: AppTheme.bodyText.copyWith(
                           letterSpacing: 2.2,
                           fontWeight: FontWeight.w800,
-                          color: _textDark,
+                          color: AppTheme.textDark,
                           fontSize: 14,
+                          height: 1.0,
                         ),
                       ),
                     ],
@@ -64,13 +59,13 @@ class RoleSelectPage extends StatelessWidget {
 
                 const SizedBox(height: 26),
 
-                // Heading (two lines like the UI)
-                const Text(
+                // Heading (two lines)
+                Text(
                   'Welcome to CareNest!\nHow will you use the app?',
-                  style: TextStyle(
+                  style: AppTheme.headingLarge.copyWith(
                     fontSize: 30,
                     fontWeight: FontWeight.w900,
-                    color: _textDark,
+                    color: const Color.fromRGBO(0, 46, 46, 1),
                     height: 1.12,
                     letterSpacing: -0.4,
                   ),
@@ -85,11 +80,11 @@ class RoleSelectPage extends StatelessWidget {
                   subtitle: 'Find work and manage visits',
                   onTap: () async {
                     await RoleStorage.saveRole(UserRole.caregiver);
-                    Navigator.pushReplacement(
+
+                    // ✅ named route navigation
+                    Navigator.pushReplacementNamed(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const CaregiverDashboardPage(),
-                      ),
+                      CaregiverDashboardPage.routeName,
                     );
                   },
                 ),
@@ -103,11 +98,11 @@ class RoleSelectPage extends StatelessWidget {
                   subtitle: 'Book care and track your health',
                   onTap: () async {
                     await RoleStorage.saveRole(UserRole.careReceiver);
-                    Navigator.pushReplacement(
+
+                    // ✅ named route navigation
+                    Navigator.pushReplacementNamed(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const CareReceiverDashboardPage(),
-                      ),
+                      CareReceiverDashboardPage.routeName,
                     );
                   },
                 ),
@@ -118,19 +113,20 @@ class RoleSelectPage extends StatelessWidget {
                 Center(
                   child: RichText(
                     text: TextSpan(
-                      style: const TextStyle(
+                      style: AppTheme.bodyText.copyWith(
                         fontSize: 15,
-                        color: _textDark,
+                        color: AppTheme.textDark,
                         fontWeight: FontWeight.w600,
                       ),
                       children: [
                         const TextSpan(text: 'Already have an account? '),
                         TextSpan(
                           text: 'Log in',
-                          style: const TextStyle(
+                          style: AppTheme.bodyText.copyWith(
                             decoration: TextDecoration.underline,
                             fontWeight: FontWeight.w900,
-                            color: _textDark,
+                            color: AppTheme.textDark,
+                            fontSize: 15,
                           ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
@@ -165,8 +161,6 @@ class _RoleCard extends StatelessWidget {
     required this.onTap,
   });
 
-  static const Color _primary = Color(0xFF16A394);
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -180,10 +174,7 @@ class _RoleCard extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0E6D68), // teal
-              Color(0xFF0B4F4B), // deep teal
-            ],
+            colors: [AppTheme.primaryDark, Color(0xFF0B4F4B)],
           ),
           boxShadow: [
             BoxShadow(
@@ -195,7 +186,7 @@ class _RoleCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Icon bubble (to mimic illustration area)
+            // Icon bubble
             Container(
               width: 64,
               height: 64,
@@ -218,7 +209,7 @@ class _RoleCard extends StatelessWidget {
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: AppTheme.headingMedium.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
                       fontSize: 18,
@@ -230,10 +221,11 @@ class _RoleCard extends StatelessWidget {
                     subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: AppTheme.bodyText.copyWith(
                       color: Colors.white.withOpacity(0.78),
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
+                      height: 1.0,
                     ),
                   ),
                 ],
@@ -242,7 +234,6 @@ class _RoleCard extends StatelessWidget {
 
             const SizedBox(width: 10),
 
-            // subtle chevron (optional)
             Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.85)),
           ],
         ),

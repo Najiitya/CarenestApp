@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/app_theme.dart';
 
 class CareReceiverDashboardPage extends StatefulWidget {
   const CareReceiverDashboardPage({super.key});
@@ -13,60 +14,42 @@ class CareReceiverDashboardPage extends StatefulWidget {
 class _CareReceiverDashboardPageState extends State<CareReceiverDashboardPage> {
   int _navIndex = 0;
 
-  // Colors tuned to your UI
-  static const _bg = Color(0xFFF7FAFA);
-  static const _cardBorder = Color(0xFFE7EEF0);
-  static const _textDark = Color(0xFF0F172A);
-  static const _textSoft = Color(0xFF7A8A96);
-  static const _primary = Color(0xFF16A394);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
           children: [
-            // Header: Hi, Mr. Perera + avatar
+            // Header
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Expanded(
-                  child: Text(
-                    'Hi, Mr. Perera',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: _textDark,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
+                Expanded(
+                  child: Text('Hi, Mr. Perera', style: AppTheme.headingLarge),
                 ),
                 const SizedBox(width: 12),
-                // Replace with real patient image:
-                // CircleAvatar(backgroundImage: AssetImage('assets/images/patient.png'))
                 const CircleAvatar(
                   radius: 18,
-                  backgroundColor: Color(0xFFE9F3F2),
-                  child: Icon(Icons.person, color: _textSoft, size: 20),
+                  backgroundColor: AppTheme.softGreen,
+                  child: Icon(Icons.person, color: AppTheme.textGrey, size: 20),
                 ),
               ],
             ),
 
             const SizedBox(height: 18),
 
-            // Current Caregiver dark card
+            // Current Caregiver card
             const _CurrentCaregiverCard(),
 
             const SizedBox(height: 18),
 
-            const Text(
+            Text(
               "Today's Care Status",
-              style: TextStyle(
+              style: AppTheme.headingMedium.copyWith(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: _textDark,
               ),
             ),
 
@@ -90,36 +73,36 @@ class _CareReceiverDashboardPageState extends State<CareReceiverDashboardPage> {
 
       // Bottom nav
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: _cardBorder)),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.12))),
         ),
         child: NavigationBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppTheme.surface,
           elevation: 0,
           height: 70,
-          indicatorColor: _primary.withOpacity(0.12),
+          indicatorColor: AppTheme.primary.withOpacity(0.12),
           selectedIndex: _navIndex,
           onDestinationSelected: (i) => setState(() => _navIndex = i),
           destinations: const [
             NavigationDestination(
               icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home, color: _primary),
+              selectedIcon: Icon(Icons.home, color: AppTheme.primary),
               label: 'Home',
             ),
             NavigationDestination(
               icon: Icon(Icons.search_outlined),
-              selectedIcon: Icon(Icons.search, color: _primary),
+              selectedIcon: Icon(Icons.search, color: AppTheme.primary),
               label: 'Find Care',
             ),
             NavigationDestination(
               icon: Icon(Icons.chat_bubble_outline),
-              selectedIcon: Icon(Icons.chat_bubble, color: _primary),
+              selectedIcon: Icon(Icons.chat_bubble, color: AppTheme.primary),
               label: 'Messages',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person, color: _primary),
+              selectedIcon: Icon(Icons.person, color: AppTheme.primary),
               label: 'Profile',
             ),
           ],
@@ -130,8 +113,6 @@ class _CareReceiverDashboardPageState extends State<CareReceiverDashboardPage> {
 }
 
 class _CurrentCaregiverCard extends StatelessWidget {
-  static const _primary = Color(0xFF16A394);
-
   const _CurrentCaregiverCard();
 
   @override
@@ -157,53 +138,52 @@ class _CurrentCaregiverCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Current Caregiver',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
+            style: AppTheme.headingMedium.copyWith(
               color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 18,
             ),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              // Replace with real caregiver photo:
-              // CircleAvatar(radius: 38, backgroundImage: AssetImage('assets/images/caregiver.png'))
               const CircleAvatar(
                 radius: 38,
                 backgroundColor: Colors.white,
                 child: CircleAvatar(
                   radius: 36,
-                  backgroundColor: Color(0xFFE9F3F2),
+                  backgroundColor: AppTheme.softGreen,
                   child: Icon(
                     Icons.medical_services_outlined,
-                    color: Color(0xFF7A8A96),
+                    color: AppTheme.textGrey,
                     size: 28,
                   ),
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Kumari Perera',
-                      style: TextStyle(
+                      style: AppTheme.headingMedium.copyWith(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                         letterSpacing: -0.2,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
                       'Verified Caregiver',
-                      style: TextStyle(
+                      style: AppTheme.bodyText.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFFA9C2BE),
+                        color: const Color(0xFFA9C2BE),
+                        height: 1.0,
                       ),
                     ),
                   ],
@@ -212,23 +192,13 @@ class _CurrentCaregiverCard extends StatelessWidget {
             ],
           ),
           const Spacer(),
+
+          // ✅ Let global theme style ElevatedButton (no styleFrom)
           SizedBox(
             width: double.infinity,
-            height: 48,
             child: ElevatedButton(
               onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              child: const Text(
-                'Chat now',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-              ),
+              child: Text('Chat now', style: AppTheme.buttonText),
             ),
           ),
         ],
@@ -248,10 +218,6 @@ class _CareStatusItem {
 
 class _CareStatusTimeline extends StatelessWidget {
   final List<_CareStatusItem> items;
-
-  static const _cardBorder = Color(0xFFE7EEF0);
-  static const _textDark = Color(0xFF0F172A);
-  static const _primary = Color(0xFF16A394);
 
   const _CareStatusTimeline({required this.items});
 
@@ -288,8 +254,8 @@ class _CareStatusTimeline extends StatelessWidget {
               child: Container(
                 margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: _cardBorder),
+                  color: AppTheme.surface,
+                  border: Border.all(color: Colors.grey.withOpacity(0.12)),
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
@@ -302,10 +268,10 @@ class _CareStatusTimeline extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   item.text,
-                  style: const TextStyle(
+                  style: AppTheme.headingMedium.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: _textDark,
+                    color: AppTheme.textDark,
                     height: 1.25,
                   ),
                 ),
@@ -321,8 +287,6 @@ class _CareStatusTimeline extends StatelessWidget {
 class _TimelineDot extends StatelessWidget {
   final _CareStatusState state;
 
-  static const _primary = Color(0xFF16A394);
-
   const _TimelineDot({required this.state});
 
   @override
@@ -333,10 +297,10 @@ class _TimelineDot extends StatelessWidget {
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: isDone ? _primary : const Color(0xFFF2F6F7),
+        color: isDone ? AppTheme.primary : const Color(0xFFF2F6F7),
         shape: BoxShape.circle,
         border: Border.all(
-          color: isDone ? _primary : const Color(0xFFD9E6E8),
+          color: isDone ? AppTheme.primary : const Color(0xFFD9E6E8),
           width: 2,
         ),
       ),
