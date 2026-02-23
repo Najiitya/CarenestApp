@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:carenest_mobile/core/app_theme.dart';
+import 'package:carenest_mobile/screens/caregiver_notification_page.dart';
 
 class PatientDetailsPage extends StatefulWidget {
   const PatientDetailsPage({super.key});
@@ -8,19 +10,16 @@ class PatientDetailsPage extends StatefulWidget {
 }
 
 class _PatientDetailsPageState extends State<PatientDetailsPage> {
-  int _currentIndex = 0;
-
-  final Color primaryBlue = const Color(0xFF6BB8F7);
-  final Color bgColor = const Color(0xFFF7F9FC);
+  int _currentIndex = 1; // Jobs selected
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: Column(
         children: [
-          /// ================= HEADER IMAGE =================
+          /// HEADER IMAGE
           Stack(
             children: [
               SizedBox(
@@ -31,16 +30,14 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                   fit: BoxFit.cover,
                 ),
               ),
-
-              /// BACK BUTTON
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: InkWell(
                     onTap: () => Navigator.pop(context),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       backgroundColor: Colors.white,
-                      child: Icon(Icons.arrow_back, color: Colors.black),
+                      child: Icon(Icons.arrow_back, color: AppTheme.primary),
                     ),
                   ),
                 ),
@@ -48,16 +45,16 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
             ],
           ),
 
-          /// ================= FIXED HEADER CARD =================
+          /// HEADER CARD
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: _patientHeaderCard(),
           ),
 
-          /// ================= SCROLLABLE CONTENT =================
+          /// CONTENT
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 140),
               child: Column(
                 children: [
                   _medicalInfoCard(),
@@ -72,126 +69,220 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
         ],
       ),
 
-      /// ================= ACTION + NAV =================
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          /// ACCEPT / DECLINE
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _softButton(
-                    label: 'Accept Visit',
-                    icon: Icons.check,
-                    bg: const Color(0xFFDFF4E7),
-                    fg: const Color(0xFF2E7D32),
+      /// ACCEPT + DECLINE + NAVIGATION
+      bottomNavigationBar: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            /// ACCEPT / DECLINE BUTTONS
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.check),
+                      label: const Text("Accept Visit"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.softGreen,
+                        foregroundColor: AppTheme.primary,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _softButton(
-                    label: 'Decline Visit',
-                    icon: Icons.close,
-                    bg: const Color(0xFFFBE4E4),
-                    fg: const Color(0xFFC62828),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _showDeclineDialog,
+                      icon: const Icon(Icons.close),
+                      label: const Text("Decline Visit"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.error.withOpacity(0.1),
+                        foregroundColor: AppTheme.error,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+
+            /// CUSTOM NAV BAR
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(26),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _navItem(Icons.home_outlined, "Home", 0),
+                  _navItem(Icons.work_outline, "Jobs", 1),
+                  _navItem(Icons.chat_bubble_outline, "Messages", 2),
+                  _navItem(Icons.person_outline, "Profile", 3),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// NAV ITEM
+  Widget _navItem(IconData icon, String label, int index) {
+    final bool isActive = _currentIndex == index;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() => _currentIndex = index);
+
+        if (index == 2) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const CaregiverNotificationsPage(),
+            ),
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isActive ? AppTheme.softGreen : Colors.transparent,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                icon,
+                size: 24,
+                color: isActive ? AppTheme.primary : AppTheme.textGrey,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isActive ? AppTheme.primary : AppTheme.textGrey,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// DECLINE POPUP
+  void _showDeclineDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text("Decline Request?", style: AppTheme.headingMedium),
+        content: Text(
+          "Are you sure you want to decline this visit request?",
+          style: AppTheme.bodyText,
+        ),
+        actions: [
+          /// GREEN HIGHLIGHT ON NO
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("No"),
           ),
 
-          /// BOTTOM NAV
-          BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() => _currentIndex = index);
+          /// YES NORMAL
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // backend later
             },
-            selectedItemColor: primaryBlue,
-            unselectedItemColor: Colors.grey,
-            type: BottomNavigationBarType.fixed,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.notifications),
-                label: 'Alerts',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
+            child: Text("Yes", style: TextStyle(color: AppTheme.textGrey)),
           ),
         ],
       ),
     );
   }
 
-  /// ================= HEADER CARD =================
+  /// HEADER CARD
   Widget _patientHeaderCard() {
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// NAME + CHAT (NO OVERFLOW)
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Mr. J. Perera',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text('Age: 72', style: TextStyle(color: Colors.grey)),
+                    children: [
+                      Text("Mr. J. Perera", style: AppTheme.headingLarge),
+                      const SizedBox(height: 4),
+                      Text("Age: 72", style: AppTheme.bodyText),
                     ],
                   ),
                 ),
                 OutlinedButton.icon(
                   onPressed: () {},
-                  icon: const Icon(Icons.chat_bubble_outline, size: 16),
-                  label: const Text('Chat'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: primaryBlue,
-                    side: BorderSide(color: primaryBlue),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
+                  icon: const Icon(Icons.chat_bubble_outline),
+                  label: const Text("Chat"),
                 ),
               ],
             ),
-
             const SizedBox(height: 12),
             const Divider(),
-
-            /// DATE + TIME
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
+              children: [
                 Row(
                   children: [
-                    Icon(Icons.calendar_today, size: 18, color: Colors.blue),
-                    SizedBox(width: 6),
-                    Text('05 Feb 2026'),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 18,
+                      color: AppTheme.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text("05 Feb 2026", style: AppTheme.bodyText),
                   ],
                 ),
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 18, color: Colors.blue),
-                    SizedBox(width: 6),
-                    Text('9:00 AM - 11:00 AM'),
+                    Icon(Icons.access_time, size: 18, color: AppTheme.primary),
+                    const SizedBox(width: 6),
+                    Text("9:00 AM - 11:00 AM", style: AppTheme.bodyText),
                   ],
                 ),
               ],
@@ -202,71 +293,49 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
     );
   }
 
-  /// ================= INFO CARDS =================
   Widget _medicalInfoCard() => _infoCard(
-    title: 'Medical Information',
+    title: "Medical Information",
     items: const [
-      _InfoItem(Icons.local_hospital, 'Condition', 'Post-surgery'),
-      _InfoItem(Icons.directions_walk, 'Mobility', 'Low'),
-      _InfoItem(Icons.monitor_heart, 'Monitoring', 'Blood pressure & vitals'),
+      _InfoItem(Icons.local_hospital, "Condition", "Post-surgery"),
+      _InfoItem(Icons.directions_walk, "Mobility", "Low"),
+      _InfoItem(Icons.monitor_heart, "Monitoring", "Blood pressure & vitals"),
     ],
   );
 
   Widget _careInstructionsCard() => _infoCard(
-    title: 'Care Instructions',
+    title: "Care Instructions",
     items: const [
       _InfoItem(
         Icons.check_circle,
-        '',
-        'Needs assistance while walking',
+        "",
+        "Needs assistance while walking",
         isCheck: true,
       ),
       _InfoItem(
         Icons.check_circle,
-        '',
-        'Medication twice a day',
+        "",
+        "Medication twice a day",
         isCheck: true,
       ),
       _InfoItem(
         Icons.check_circle,
-        '',
-        'Physiotherapy required',
+        "",
+        "Physiotherapy required",
         isCheck: true,
       ),
     ],
   );
 
   Widget _emergencyContactCard() => _infoCard(
-    title: 'Emergency Contact',
+    title: "Emergency Contact",
     items: const [
-      _InfoItem(Icons.person, 'Name', 'S. Perera (Son)'),
-      _InfoItem(Icons.phone, 'Phone', '077 555 8899'),
+      _InfoItem(Icons.person, "Name", "S. Perera (Son)"),
+      _InfoItem(Icons.phone, "Phone", "077 555 8899"),
     ],
   );
-
-  /// ================= REUSABLE =================
-  Widget _softButton({
-    required String label,
-    required IconData icon,
-    required Color bg,
-    required Color fg,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: () {},
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: bg,
-        foregroundColor: fg,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-    );
-  }
 }
 
-/// ================= MODELS =================
+/// MODEL
 class _InfoItem {
   final IconData icon;
   final String label;
@@ -278,33 +347,26 @@ class _InfoItem {
 
 Widget _infoCard({required String title, required List<_InfoItem> items}) {
   return Card(
-    elevation: 3,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
     child: Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          Text(title, style: AppTheme.headingMedium),
           const SizedBox(height: 12),
           ...items.map(
             (item) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
                 children: [
-                  Icon(
-                    item.icon,
-                    color: item.isCheck ? Colors.green : Colors.blue,
-                  ),
+                  Icon(item.icon, color: AppTheme.primary),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       item.label.isEmpty
                           ? item.value
                           : '${item.label}: ${item.value}',
+                      style: AppTheme.bodyText,
                     ),
                   ),
                 ],
