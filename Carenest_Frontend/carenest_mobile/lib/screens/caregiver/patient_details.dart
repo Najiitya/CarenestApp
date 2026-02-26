@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carenest_mobile/core/app_theme.dart';
-import 'package:carenest_mobile/screens/caregiver/caregiver_notification_page.dart';
+import 'package:carenest_mobile/widgets/caregiver_navigationbar_mobile.dart';
 
 class PatientDetailsPage extends StatefulWidget {
   const PatientDetailsPage({super.key});
@@ -10,8 +10,6 @@ class PatientDetailsPage extends StatefulWidget {
 }
 
 class _PatientDetailsPageState extends State<PatientDetailsPage> {
-  int _currentIndex = 1; // Jobs selected
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,7 +67,7 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
         ],
       ),
 
-      /// ACCEPT + DECLINE + NAVIGATION
+      /// ACCEPT BUTTONS + NAV BAR
       bottomNavigationBar: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -116,79 +114,8 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
               ),
             ),
 
-            /// CUSTOM NAV BAR
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(26),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _navItem(Icons.home_outlined, "Home", 0),
-                  _navItem(Icons.work_outline, "Jobs", 1),
-                  _navItem(Icons.chat_bubble_outline, "Messages", 2),
-                  _navItem(Icons.person_outline, "Profile", 3),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// NAV ITEM
-  Widget _navItem(IconData icon, String label, int index) {
-    final bool isActive = _currentIndex == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() => _currentIndex = index);
-
-        if (index == 2) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const CaregiverNotificationsPage(),
-            ),
-          );
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isActive ? AppTheme.softGreen : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                icon,
-                size: 24,
-                color: isActive ? AppTheme.primary : AppTheme.textGrey,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: isActive ? AppTheme.primary : AppTheme.textGrey,
-              ),
-            ),
+            /// LEADER NAVIGATION BAR
+            const CaregiverNavigationBarMobile(currentIndex: 0),
           ],
         ),
       ),
@@ -207,27 +134,16 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
           style: AppTheme.bodyText,
         ),
         actions: [
-          /// GREEN HIGHLIGHT ON NO
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
             ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             child: const Text("No"),
           ),
-
-          /// YES NORMAL
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // backend later
-            },
+            onPressed: () => Navigator.pop(context),
             child: Text("Yes", style: TextStyle(color: AppTheme.textGrey)),
           ),
         ],
@@ -296,56 +212,41 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
   Widget _medicalInfoCard() => _infoCard(
     title: "Medical Information",
     items: const [
-      _InfoItem(Icons.local_hospital, "Condition", "Post-surgery"),
-      _InfoItem(Icons.directions_walk, "Mobility", "Low"),
-      _InfoItem(Icons.monitor_heart, "Monitoring", "Blood pressure & vitals"),
+      InfoItem(Icons.local_hospital, "Condition", "Post-surgery"),
+      InfoItem(Icons.directions_walk, "Mobility", "Low"),
+      InfoItem(Icons.monitor_heart, "Monitoring", "Blood pressure & vitals"),
     ],
   );
 
   Widget _careInstructionsCard() => _infoCard(
     title: "Care Instructions",
     items: const [
-      _InfoItem(
-        Icons.check_circle,
-        "",
-        "Needs assistance while walking",
-        isCheck: true,
-      ),
-      _InfoItem(
-        Icons.check_circle,
-        "",
-        "Medication twice a day",
-        isCheck: true,
-      ),
-      _InfoItem(
-        Icons.check_circle,
-        "",
-        "Physiotherapy required",
-        isCheck: true,
-      ),
+      InfoItem(Icons.check_circle, "", "Needs assistance while walking"),
+      InfoItem(Icons.check_circle, "", "Medication twice a day"),
+      InfoItem(Icons.check_circle, "", "Physiotherapy required"),
     ],
   );
 
   Widget _emergencyContactCard() => _infoCard(
     title: "Emergency Contact",
     items: const [
-      _InfoItem(Icons.person, "Name", "S. Perera (Son)"),
-      _InfoItem(Icons.phone, "Phone", "077 555 8899"),
+      InfoItem(Icons.person, "Name", "S. Perera (Son)"),
+      InfoItem(Icons.phone, "Phone", "077 555 8899"),
     ],
   );
 }
 
 /// MODEL
-class _InfoItem {
+class InfoItem {
   final IconData icon;
   final String label;
   final String value;
-  final bool isCheck;
 
-  const _InfoItem(this.icon, this.label, this.value, {this.isCheck = false});
+  const InfoItem(this.icon, this.label, this.value);
 }
 
-Widget _infoCard({required String title, required List<_InfoItem> items}) {
+/// INFO CARD WIDGET
+Widget _infoCard({required String title, required List<InfoItem> items}) {
   return Card(
     child: Padding(
       padding: const EdgeInsets.all(16),

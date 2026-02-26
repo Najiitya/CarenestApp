@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carenest_mobile/core/app_theme.dart';
-import 'package:carenest_mobile/screens/patient/patient_notification_page.dart';
+import 'package:carenest_mobile/widgets/carereceiver_navigationbar_mobile.dart';
 
 class CaregiverDetailsPage extends StatefulWidget {
   const CaregiverDetailsPage({super.key});
@@ -11,7 +11,6 @@ class CaregiverDetailsPage extends StatefulWidget {
 
 class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
   int selectedTab = 0;
-  int bottomIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +19,7 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
 
       body: Column(
         children: [
-          // ================= HEADER (FIXED) =================
+          // ================= HEADER =================
           Stack(
             children: [
               Image.asset(
@@ -44,7 +43,7 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
             ],
           ),
 
-          // ================= INFO CARD (FIXED) =================
+          // ================= INFO CARD =================
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: _infoCard(),
@@ -58,7 +57,7 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
 
           const SizedBox(height: 12),
 
-          // ================= SCROLLABLE CONTENT =================
+          // ================= CONTENT =================
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
@@ -88,12 +87,12 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
         ],
       ),
 
-      // ================= BOOK BUTTON + NAV =================
+      // ================= BOOK BUTTON + CARE RECEIVER NAV =================
       bottomNavigationBar: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ================= BOOK BUTTON (SMALLER) =================
+            // BOOK BUTTON
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SizedBox(
@@ -116,30 +115,9 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
 
             const SizedBox(height: 10),
 
-            // ================= MODERN NAV BAR =================
-            Container(
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(26),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _navItem(Icons.home_outlined, "Home", 0),
-                  _navItem(Icons.search, "Find Care", 1),
-                  _navItem(Icons.chat_bubble_outline, "Messages", 2),
-                  _navItem(Icons.person_outline, "Profile", 3),
-                ],
-              ),
+            // ✅ CARE RECEIVER NAVIGATION BAR
+            const CareReceiverNavigationBarMobile(
+              currentIndex: 1, // Find Care selected
             ),
           ],
         ),
@@ -156,16 +134,11 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // LEFT SIDE
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Kumari Perera',
-                    style: AppTheme.headingLarge,
-                    softWrap: true,
-                  ),
+                  Text('Kumari Perera', style: AppTheme.headingLarge),
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -177,10 +150,7 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
                 ],
               ),
             ),
-
             const SizedBox(width: 12),
-
-            // RIGHT SIDE
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -188,9 +158,7 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
                 Text('LKR 800 / hour', style: AppTheme.headingMedium),
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
-                  onPressed: () {
-                    // ❌ Chat does nothing
-                  },
+                  onPressed: () {},
                   icon: const Icon(Icons.chat_bubble_outline, size: 16),
                   label: const Text('Chat'),
                 ),
@@ -198,51 +166,6 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // ================= NAV ITEM =================
-
-  Widget _navItem(IconData icon, String label, int index) {
-    final bool isActive = bottomIndex == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() => bottomIndex = index);
-
-        // ✅ ONLY Messages opens Notification page
-        if (index == 2) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const PatientNotificationsPage()),
-          );
-        }
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isActive ? AppTheme.softGreen : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              icon,
-              color: isActive ? AppTheme.primary : AppTheme.textGrey,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: AppTheme.bodyText.copyWith(
-              color: isActive ? AppTheme.primary : AppTheme.textGrey,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ],
       ),
     );
   }

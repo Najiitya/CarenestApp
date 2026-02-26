@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carenest_mobile/core/app_theme.dart';
+import 'package:carenest_mobile/widgets/carereceiver_navigationbar_mobile.dart';
 
 class PatientNotificationsPage extends StatefulWidget {
   const PatientNotificationsPage({super.key});
@@ -10,8 +11,6 @@ class PatientNotificationsPage extends StatefulWidget {
 }
 
 class _PatientNotificationsPageState extends State<PatientNotificationsPage> {
-  int bottomIndex = 2; // Messages selected
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,71 +49,11 @@ class _PatientNotificationsPageState extends State<PatientNotificationsPage> {
         ],
       ),
 
-      // ================= CUSTOM NAVIGATION =================
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navItem(Icons.home_outlined, "Home", 0),
-              _navItem(Icons.search, "Find Care", 1),
-              _navItem(Icons.chat_bubble_outline, "Messages", 2),
-              _navItem(Icons.person_outline, "Profile", 3),
-            ],
-          ),
+      // ✅ CARE RECEIVER NAVIGATION BAR
+      bottomNavigationBar: const SafeArea(
+        child: CareReceiverNavigationBarMobile(
+          currentIndex: 2, // Notifications selected
         ),
-      ),
-    );
-  }
-
-  // ================= NAV ITEM =================
-
-  Widget _navItem(IconData icon, String label, int index) {
-    final bool isActive = bottomIndex == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() => bottomIndex = index);
-        // Navigation can be added later if needed
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isActive ? AppTheme.softGreen : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              icon,
-              color: isActive ? AppTheme.primary : AppTheme.textGrey,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: AppTheme.bodyText.copyWith(
-              color: isActive ? AppTheme.primary : AppTheme.textGrey,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ],
       ),
     );
   }

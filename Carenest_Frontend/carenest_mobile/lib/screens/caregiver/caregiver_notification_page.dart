@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carenest_mobile/core/app_theme.dart';
+import 'package:carenest_mobile/widgets/caregiver_navigationbar_mobile.dart';
 
 class CaregiverNotificationsPage extends StatefulWidget {
   const CaregiverNotificationsPage({super.key});
@@ -11,8 +12,6 @@ class CaregiverNotificationsPage extends StatefulWidget {
 
 class _CaregiverNotificationsPageState
     extends State<CaregiverNotificationsPage> {
-  int _bottomIndex = 1; // Alerts selected
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,70 +50,9 @@ class _CaregiverNotificationsPageState
         ],
       ),
 
-      // ================= CUSTOM BOTTOM NAV =================
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navItem(Icons.home_outlined, "Home", 0),
-              _navItem(Icons.work_outline, "Jobs", 1),
-              _navItem(Icons.chat_bubble_outline, "Messages", 2),
-              _navItem(Icons.person_outline, "Profile", 3),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ================= NAV ITEM =================
-  Widget _navItem(IconData icon, String label, int index) {
-    final bool isActive = _bottomIndex == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _bottomIndex = index; // ONLY change highlight
-        });
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isActive ? AppTheme.softGreen : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              icon,
-              color: isActive ? AppTheme.primary : AppTheme.textGrey,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: AppTheme.bodyText.copyWith(
-              color: isActive ? AppTheme.primary : AppTheme.textGrey,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ],
+      // ================= LEADER NAVIGATION BAR =================
+      bottomNavigationBar: const CaregiverNavigationBarMobile(
+        currentIndex: 1, // 1 = Notifications tab
       ),
     );
   }
