@@ -15,7 +15,7 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
   final TextEditingController notesController = TextEditingController();
   bool _isSubmitting = false;
 
-  int? _visitId;
+  String? _visitId;
   String? _patientName;
 
   final List<String> statusList = ['In Progress', 'Completed'];
@@ -25,7 +25,7 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is Map<String, dynamic> && _visitId == null) {
-      _visitId = args['visitId'] as int?;
+      _visitId = args['visitId']?.toString();
       _patientName = args['patientName'] as String?;
     }
   }
@@ -73,7 +73,7 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
         'title': 'Visit Status Updated',
         'description': 'Your visit on ${booking['date']} has been marked as $selectedStatus',
         'type': 'booking',
-        'related_booking': _visitId,
+        'related_booking': _visitId?.toString(),
         'date': '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}',
         'time': '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:00',
       });
