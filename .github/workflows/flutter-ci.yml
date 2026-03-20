@@ -56,11 +56,11 @@ jobs:
         continue-on-error: true
         run: |
           if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/carenest-release.jks
             echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
             echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
             echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
             echo "storeFile=carenest-release.jks" >> android/key.properties
-            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/carenest-release.jks
             flutter build appbundle --release
           else
             echo "Keystore secrets not configured - skipping release build"
