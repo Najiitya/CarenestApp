@@ -469,7 +469,7 @@ class _CurrentCaregiverCard extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               SizedBox(
-                width: double.infinity, height: 46,
+                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0EA5A0), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
@@ -538,7 +538,7 @@ class _CompletedSessionCard extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               SizedBox(
-                width: double.infinity, height: 46,
+                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pushNamed(
