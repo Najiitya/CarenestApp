@@ -478,7 +478,7 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
             // Submit button
             SizedBox(
               width: double.infinity,
-              height: 54,
+              
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _paymentReceived

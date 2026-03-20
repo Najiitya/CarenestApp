@@ -483,7 +483,7 @@ class _PatientReviewPageState extends State<PatientReviewPage> {
                       // ── Submit Button ──
                       SizedBox(
                         width: double.infinity,
-                        height: 50,
+                        
                         child: ElevatedButton(
                           onPressed: _isSubmitting ? null : submitReview,
                           style: ElevatedButton.styleFrom(

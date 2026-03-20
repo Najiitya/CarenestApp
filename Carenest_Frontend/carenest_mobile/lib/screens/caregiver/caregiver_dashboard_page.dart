@@ -664,7 +664,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
           if (status == 'Ongoing')
             SizedBox(
               width: double.infinity,
-              height: 48,
+              
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(
@@ -695,7 +695,6 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
               children: [
                 Expanded(
                   child: SizedBox(
-                    height: 48,
                     child: OutlinedButton(
                       onPressed: () {
                         if (bookingId.isNotEmpty) {
@@ -717,7 +716,6 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                 Expanded(
                   flex: 2,
                   child: SizedBox(
-                    height: 48,
                     child: ElevatedButton(
                       onPressed: () => _startVisit(visit),
                       style: ElevatedButton.styleFrom(

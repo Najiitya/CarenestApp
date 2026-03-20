@@ -429,7 +429,7 @@ class _CaregiverVerificationPageState
           // Submit button
           SizedBox(
             width: double.infinity,
-            height: 50,
+            
             child: ElevatedButton.icon(
               onPressed: allSelected ? _submitDocuments : null,
               icon: const Icon(Icons.cloud_upload),
@@ -646,7 +646,7 @@ class _CaregiverVerificationPageState
           // Check Status button
           SizedBox(
             width: double.infinity,
-            height: 50,
+            
             child: ElevatedButton.icon(
               onPressed: _isCheckingStatus ? null : _checkVerificationStatus,
               icon: _isCheckingStatus
@@ -819,7 +819,7 @@ class _CaregiverVerificationPageState
           // Resubmit button
           SizedBox(
             width: double.infinity,
-            height: 50,
+            
             child: ElevatedButton.icon(
               onPressed: () {
                 setState(() {

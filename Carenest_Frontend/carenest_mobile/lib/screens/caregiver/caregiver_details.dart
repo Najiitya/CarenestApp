@@ -319,7 +319,7 @@ class _CaregiverDetailsPageState extends State<CaregiverDetailsPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SizedBox(
-                height: 50,
+                
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
