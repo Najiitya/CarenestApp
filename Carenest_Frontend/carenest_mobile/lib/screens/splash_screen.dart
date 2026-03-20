@@ -125,14 +125,14 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Logo
-            Image.asset('../assets/images/logo_white.png', height: 100, errorBuilder: (context, error, stack) {
+            Image.asset('assets/images/logo_white.png', height: 100, errorBuilder: (context, error, stack) {
               return const Icon(Icons.favorite, size: 80, color: AppTheme.surface);
             }),
 
             const SizedBox(height: 24),
 
             // App Name
-            Image(image: const AssetImage('../assets/images/typo_white.png'), height: 28, errorBuilder: (context, error, stack) {
+            Image(image: const AssetImage('assets/images/typo_white.png'), height: 28, errorBuilder: (context, error, stack) {
               return const Text(
                 'CARENEST',
                 style: TextStyle(
