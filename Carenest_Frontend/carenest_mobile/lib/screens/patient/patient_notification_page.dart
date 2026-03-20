@@ -67,13 +67,13 @@ class _PatientNotificationsPageState extends State<PatientNotificationsPage> {
         .eq('user_auth_id', uid)
         .order('created_at', ascending: false)
         .listen((data) {
-          if (mounted) {
-            setState(() {
-              _notifications = List<Map<String, dynamic>>.from(data);
-              _isLoading = false;
-            });
-          }
+      if (mounted) {
+        setState(() {
+          _notifications = List<Map<String, dynamic>>.from(data);
+          _isLoading = false;
         });
+      }
+    });
   }
 
   Future<void> _markAsRead(int notificationId) async {
@@ -134,9 +134,8 @@ class _PatientNotificationsPageState extends State<PatientNotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final unreadCount = _notifications
-        .where((n) => n['is_read'] != true)
-        .length;
+    final unreadCount =
+        _notifications.where((n) => n['is_read'] != true).length;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -149,38 +148,33 @@ class _PatientNotificationsPageState extends State<PatientNotificationsPage> {
           if (unreadCount > 0)
             TextButton(
               onPressed: _clearAllNotifications,
-              child: Text(
-                'Mark all read',
-                style: AppTheme.bodyText.copyWith(
-                  color: AppTheme.primary,
-                  fontSize: 12,
-                ),
-              ),
+              child: Text('Mark all read',
+                  style: AppTheme.bodyText.copyWith(
+                      color: AppTheme.primary, fontSize: 12)),
             ),
         ],
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.primary),
-            )
+              child: CircularProgressIndicator(color: AppTheme.primary))
           : _notifications.isEmpty
-          ? _buildEmptyState()
-          : RefreshIndicator(
-              onRefresh: _loadNotifications,
-              color: AppTheme.primary,
-              child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
-                itemCount: _notifications.length,
-                itemBuilder: (context, index) {
-                  final n = _notifications[index];
-                  final isRead = n['is_read'] == true;
-                  return GestureDetector(
-                    onTap: () => _onNotificationTap(n),
-                    child: _buildNotificationCard(n, isRead),
-                  );
-                },
-              ),
-            ),
+              ? _buildEmptyState()
+              : RefreshIndicator(
+                  onRefresh: _loadNotifications,
+                  color: AppTheme.primary,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
+                    itemCount: _notifications.length,
+                    itemBuilder: (context, index) {
+                      final n = _notifications[index];
+                      final isRead = n['is_read'] == true;
+                      return GestureDetector(
+                        onTap: () => _onNotificationTap(n),
+                        child: _buildNotificationCard(n, isRead),
+                      );
+                    },
+                  ),
+                ),
       bottomNavigationBar: const SafeArea(
         child: CareReceiverNavigationBarMobile(currentIndex: 2),
       ),
@@ -250,38 +244,29 @@ class _PatientNotificationsPageState extends State<PatientNotificationsPage> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 14,
-                        color: AppTheme.textGrey,
-                      ),
+                      Icon(Icons.calendar_today,
+                          size: 14, color: AppTheme.textGrey),
                       const SizedBox(width: 4),
-                      Text(
-                        n['date']?.toString() ?? '',
-                        style: AppTheme.bodyText.copyWith(fontSize: 12),
-                      ),
+                      Text(n['date']?.toString() ?? '',
+                          style:
+                              AppTheme.bodyText.copyWith(fontSize: 12)),
                       if ((n['time'] ?? '').toString().isNotEmpty) ...[
                         const SizedBox(width: 12),
-                        Icon(
-                          Icons.access_time,
-                          size: 14,
-                          color: AppTheme.textGrey,
-                        ),
+                        Icon(Icons.access_time,
+                            size: 14, color: AppTheme.textGrey),
                         const SizedBox(width: 4),
                         Text(
                           n['time'].toString().length >= 5
                               ? n['time'].toString().substring(0, 5)
                               : n['time'].toString(),
-                          style: AppTheme.bodyText.copyWith(fontSize: 12),
+                          style:
+                              AppTheme.bodyText.copyWith(fontSize: 12),
                         ),
                       ],
                       const Spacer(),
                       if (isClickable)
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 14,
-                          color: AppTheme.textGrey,
-                        ),
+                        Icon(Icons.arrow_forward_ios,
+                            size: 14, color: AppTheme.textGrey),
                     ],
                   ),
                 ],

@@ -11,92 +11,183 @@ class UpdateCareStatusPage extends StatefulWidget {
 }
 
 class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
-  String? selectedStatus;
+  final supabase = Supabase.instance.client;
+
   final TextEditingController notesController = TextEditingController();
+  bool _isLoading = true;
   bool _isSubmitting = false;
-
-  String? _visitId;
-  String? _patientName;
-
-  final List<String> statusList = ['In Progress', 'Completed'];
+  bool _paymentReceived = false;
+  String? _bookingId;
+  Map<String, dynamic>? _booking;
+  Map<String, dynamic>? _patient;
+  double _hourlyRate = 0;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is Map<String, dynamic> && _visitId == null) {
-      _visitId = args['visitId']?.toString();
-      _patientName = args['patientName'] as String?;
+    if (args != null && _bookingId == null) {
+      _bookingId = args.toString();
+      _loadBooking(_bookingId!);
+    } else if (args == null && _bookingId == null) {
+      setState(() => _isLoading = false);
     }
   }
 
-  void updateCareStatus() async {
-    if (selectedStatus == null) {
+  @override
+  void dispose() {
+    notesController.dispose();
+    super.dispose();
+  }
+
+  /// Calculate hours between two TIME strings
+  double _calculateHours(String? startTime, String? endTime) {
+    if (startTime == null || endTime == null) return 1;
+    try {
+      final startParts = startTime.split(':');
+      final endParts = endTime.split(':');
+      final startMinutes =
+          int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
+      final endMinutes =
+          int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
+      final diff = (endMinutes - startMinutes) / 60.0;
+      return diff > 0 ? diff : 1;
+    } catch (_) {
+      return 1;
+    }
+  }
+
+  Future<void> _loadBooking(String bookingId) async {
+    try {
+      final booking = await supabase
+          .from('bookings')
+          .select('*, patient_profiles(name, auth_id)')
+          .eq('id', bookingId)
+          .single();
+
+      // Get caregiver hourly rate
+      final uid = supabase.auth.currentUser!.id;
+      final profile = await supabase
+          .from('caregiver_profiles')
+          .select('hourly_rate')
+          .eq('auth_id', uid)
+          .single();
+
+      if (mounted) {
+        setState(() {
+          _booking = booking;
+          _patient = booking['patient_profiles'];
+          _hourlyRate = double.tryParse(
+                  profile['hourly_rate']?.toString() ?? '0') ??
+              0;
+          notesController.text = booking['care_notes'] ?? '';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  double get _paymentAmount {
+    if (_booking == null || _hourlyRate == 0) return 0;
+    final hours = _calculateHours(
+      _booking!['start_time']?.toString(),
+      _booking!['end_time']?.toString(),
+    );
+    return hours * _hourlyRate;
+  }
+
+  double get _sessionHours {
+    if (_booking == null) return 0;
+    return _calculateHours(
+      _booking!['start_time']?.toString(),
+      _booking!['end_time']?.toString(),
+    );
+  }
+
+  // ================= COMPLETION LOGIC =================
+  Future<void> completeSession() async {
+    // 1. Mandatory Care Notes Check
+    if (notesController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a status')),
+        const SnackBar(
+          content:
+              Text('Care notes are mandatory to complete the session.'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
-    if (_visitId == null) {
+    // 2. Payment confirmation check
+    if (!_paymentReceived) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No visit selected'), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text(
+              'Please confirm that payment has been received before completing the session.'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
+
+    if (_bookingId == null) return;
 
     setState(() => _isSubmitting = true);
 
     try {
-      final supabase = Supabase.instance.client;
-
+      // 3. Update booking: status to Completed, payment_status to Paid
       await supabase.from('bookings').update({
-        'status': selectedStatus,
-      }).eq('id', _visitId!);
+        'status': 'Completed',
+        'care_notes': notesController.text.trim(),
+        'payment_status': 'Paid',
+      }).eq('id', _bookingId!);
 
-      // Send notification to patient
-      final booking = await supabase
-          .from('bookings')
-          .select('patient_id, date')
-          .eq('id', _visitId!)
-          .single();
-
-      final patient = await supabase
-          .from('patient_profiles')
-          .select('auth_id')
-          .eq('id', booking['patient_id'])
-          .single();
-
-      final now = DateTime.now();
-      await supabase.from('notifications').insert({
-        'user_auth_id': patient['auth_id'],
-        'title': 'Visit Status Updated',
-        'description': 'Your visit on ${booking['date']} has been marked as $selectedStatus',
-        'type': 'booking',
-        'related_booking': _visitId?.toString(),
-        'date': '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}',
-        'time': '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:00',
-      });
+      // 4. Send notification to patient
+      final patientAuthId = _patient?['auth_id'];
+      if (patientAuthId != null) {
+        final now = DateTime.now();
+        await supabase.from('notifications').insert({
+          'user_auth_id': patientAuthId,
+          'title': 'Session Completed',
+          'description':
+              'Your care session has been completed. Payment of LKR ${_paymentAmount.toInt()} received.',
+          'type': 'booking',
+          'related_booking': _bookingId,
+          'date':
+              '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}',
+          'time':
+              '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:00',
+          'is_read': false,
+        });
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Care status updated successfully'),
+            content: Text('Session completed & payment confirmed!'),
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
-      if (mounted) setState(() => _isSubmitting = false);
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
+  // ====================================================
 
   Widget buildCard({
     required IconData icon,
@@ -105,7 +196,8 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
   }) {
     return Card(
       color: AppTheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16)),
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
@@ -128,8 +220,44 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
     );
   }
 
+  String _formatTime(String? time) {
+    if (time == null || time.isEmpty) return '';
+    try {
+      final parts = time.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = parts[1];
+      final period = hour >= 12 ? 'PM' : 'AM';
+      final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+      return '$displayHour:$minute $period';
+    } catch (_) {
+      return time;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppTheme.background,
+        body: Center(
+          child: CircularProgressIndicator(color: AppTheme.primary),
+        ),
+      );
+    }
+
+    final patientName = _patient?['name'] ?? 'Patient';
+    final date = _booking?['date'] ?? '';
+    final timeSlot = _booking?['time_slot'] ?? '';
+    final startTime = _booking?['start_time'] ?? '';
+    final endTime = _booking?['end_time'] ?? '';
+    final displayTime = timeSlot.isNotEmpty
+        ? timeSlot
+        : (startTime.isNotEmpty
+            ? '${_formatTime(startTime)} - ${_formatTime(endTime)}'
+            : '');
+    final payment = _paymentAmount;
+    final hours = _sessionHours;
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
@@ -137,7 +265,7 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Update Care Status',
+          'Complete Session',
           style: AppTheme.headingMedium.copyWith(color: Colors.white),
         ),
         leading: IconButton(
@@ -145,12 +273,12 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Patient info header
             Card(
               color: AppTheme.primaryDark,
               shape: RoundedRectangleBorder(
@@ -161,77 +289,248 @@ class _UpdateCareStatusPageState extends State<UpdateCareStatusPage> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    const Icon(Icons.person, size: 38, color: AppTheme.textDark),
-                    const SizedBox(width: 6),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(_patientName ?? 'Patient', style: AppTheme.headingLarge),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Visit ID: ${_visitId ?? '-'}',
-                          style: AppTheme.bodyText,
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.white.withOpacity(0.2),
+                      child: Text(
+                        patientName[0].toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                      ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(patientName,
+                              style: AppTheme.headingLarge
+                                  .copyWith(color: Colors.white)),
+                          const SizedBox(height: 4),
+                          if (date.isNotEmpty)
+                            Text(
+                              '$date ${displayTime.isNotEmpty ? "| $displayTime" : ""}',
+                              style: AppTheme.bodyText
+                                  .copyWith(color: Colors.white70),
+                            ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            buildCard(
-              icon: Icons.medical_services,
-              title: 'Care Status',
-              child: DropdownButtonFormField<String>(
-                value: selectedStatus,
-                hint: const Text('Select status'),
-                items: statusList.map((status) {
-                  return DropdownMenuItem(value: status, child: Text(status));
-                }).toList(),
-                onChanged: (value) => setState(() => selectedStatus = value),
-                decoration: const InputDecoration(hintText: 'Select status'),
+            // ── Payment Card ──
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF0E3C3A), Color(0xFF062C2B)],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.payments, color: Colors.white70, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'PAYMENT TO COLLECT',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.1,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  _paymentRow(
+                      'Hourly Rate', 'LKR ${_hourlyRate.toInt()}'),
+                  const SizedBox(height: 8),
+                  _paymentRow(
+                      'Duration', '${hours.toStringAsFixed(1)} hours'),
+                  const SizedBox(height: 12),
+                  const Divider(color: Colors.white24),
+                  const SizedBox(height: 12),
+
+                  // Total
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total Amount',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'LKR ${payment.toInt()}',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF0EA5A0),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 16),
 
+            // ── Payment Confirmation Checkbox ──
+            Container(
+              decoration: BoxDecoration(
+                color: _paymentReceived
+                    ? Colors.green.shade50
+                    : Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: _paymentReceived
+                      ? Colors.green.shade300
+                      : Colors.orange.shade300,
+                ),
+              ),
+              child: CheckboxListTile(
+                value: _paymentReceived,
+                onChanged: (val) {
+                  setState(() => _paymentReceived = val ?? false);
+                },
+                activeColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                title: Text(
+                  'I confirm that payment of LKR ${payment.toInt()} has been received from the patient',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: _paymentReceived
+                        ? Colors.green.shade800
+                        : Colors.orange.shade800,
+                  ),
+                ),
+                subtitle: Text(
+                  _paymentReceived
+                      ? 'Payment confirmed'
+                      : 'You must confirm payment before completing',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _paymentReceived
+                        ? Colors.green.shade600
+                        : Colors.orange.shade600,
+                  ),
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Care Notes (Mandatory)
             buildCard(
               icon: Icons.note_alt,
-              title: 'Care Notes',
+              title: 'Care Notes (Required)',
               child: TextFormField(
                 controller: notesController,
                 maxLines: 8,
-                decoration: const InputDecoration(
-                  hintText: 'Enter care notes...',
+                decoration: InputDecoration(
+                  hintText:
+                      'Please detail the care provided during this session...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        const BorderSide(color: AppTheme.primary),
+                  ),
                 ),
               ),
             ),
 
             const SizedBox(height: 30),
 
+            // Submit button
             SizedBox(
               width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
+              height: 54,
+              child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
+                  backgroundColor: _paymentReceived
+                      ? AppTheme.primary
+                      : Colors.grey.shade400,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
                 ),
-                onPressed: _isSubmitting ? null : updateCareStatus,
-                child: _isSubmitting
+                onPressed:
+                    _isSubmitting ? null : completeSession,
+                icon: _isSubmitting
                     ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2.5),
                       )
-                    : const Text('Update'),
+                    : const Icon(Icons.check_circle,
+                        color: Colors.white),
+                label: Text(
+                  _isSubmitting
+                      ? 'Completing...'
+                      : 'Complete Session (LKR ${payment.toInt()})',
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               ),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
-      bottomNavigationBar: const CaregiverNavigationBarMobile(currentIndex: 0),
+      bottomNavigationBar:
+          const CaregiverNavigationBarMobile(currentIndex: 0),
+    );
+  }
+
+  Widget _paymentRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label,
+            style:
+                const TextStyle(fontSize: 14, color: Colors.white54)),
+        Text(value,
+            style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Colors.white)),
+      ],
     );
   }
 }
