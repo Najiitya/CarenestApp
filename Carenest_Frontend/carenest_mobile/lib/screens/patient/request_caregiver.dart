@@ -124,7 +124,9 @@ class _RequestCarePageState extends State<RequestCarePage> {
       final timeSlot = '${startTime!.format(context)} - ${endTime!.format(context)}';
 
       // Create booking
+      final bookingId = 'BK-${DateTime.now().millisecondsSinceEpoch}';
       await supabase.from('bookings').insert({
+        'id': bookingId,
         'patient_id': patientId,
         'caregiver_id': _caregiverId,
         'date': dateStr,
