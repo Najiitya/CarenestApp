@@ -503,11 +503,11 @@ class _JobCard extends StatelessWidget {
           const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
-            height: 42,
             child: OutlinedButton(
               onPressed: onViewDetails,
               style: OutlinedButton.styleFrom(
                 foregroundColor: _textSoft,
+                padding: const EdgeInsets.symmetric(vertical: 13),
                 side: const BorderSide(color: _cardBorder),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),

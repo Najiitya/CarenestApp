@@ -139,13 +139,13 @@ class _CareReceiverDashboardPageState extends State<CareReceiverDashboardPage> {
                             const SizedBox(height: 16),
                             SizedBox(
                               width: double.infinity,
-                              height: 46,
                               child: ElevatedButton(
                                 onPressed: () => Navigator.pushNamed(context, '/caregiver_search'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: _primary,
                                   foregroundColor: Colors.white,
                                   elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 ),
                                 child: const Text(
