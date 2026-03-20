@@ -14,7 +14,6 @@ import 'screens/patient/patient_details.dart';
 import 'screens/patient/request_caregiver.dart';
 import 'screens/patient/patient_notification_page.dart';
 import 'screens/patient/search_caregiver_page.dart';
-import 'screens/patient/patient_review_page.dart';
 import 'screens/caregiver/caregiver_job_page.dart';
 // caregiver screens
 import 'screens/caregiver/caregiver_register_page.dart';
@@ -24,6 +23,7 @@ import 'screens/caregiver/caregiver_details.dart';
 import 'screens/caregiver/update_caregiver_status.dart';
 import 'screens/caregiver/caregiver_notification_page.dart';
 import 'screens/caregiver/schedule_page.dart';
+import 'screens/patient/patient_review_page.dart';
 // common screens
 import 'pages/role_select_page.dart';
 
@@ -36,8 +36,8 @@ Future<void> main() async {
 
   // Initialize your Supabase database connection
   await Supabase.initialize(
-    url: 'https://kpavgqkksmeskrvyhjuj.supabase.co',
-    anonKey: 'sb_publishable__uM8woW2XUtC_RyaFCUMlA_J4Hm3-yC',
+    url: 'https://kpavgqkksmeskrvyhjuj.supabase.co', // project URL
+    anonKey: 'sb_publishable__uM8woW2XUtC_RyaFCUMlA_J4Hm3-yC',         // Paste long anon key here
   );
 
   runApp(const CareNestApp());
@@ -70,7 +70,7 @@ class CareNestApp extends StatelessWidget {
         '/patient_request-caregiver': (context) => const RequestCarePage(),
         '/patient_notifications': (context) => const PatientNotificationsPage(),
         '/caregiver_search': (context) => const CaregiverSearchPage(),
-        '/patient_review': (context) => const PatientReviewPage(),
+         '/review_page': (context) => const PatientReviewPage(),
 
         // --- Caregiver Routes ---
         '/caregiver_register': (context) => const RegisterCaregiverScreen(),

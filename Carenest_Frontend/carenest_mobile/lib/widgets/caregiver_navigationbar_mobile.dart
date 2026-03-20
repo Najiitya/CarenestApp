@@ -42,11 +42,12 @@ class _CaregiverNavigationBarMobileState
         .stream(primaryKey: ['id'])
         .eq('user_auth_id', uid)
         .listen((data) {
-          if (mounted) {
-            final count = data.where((n) => n['is_read'] != true).length;
-            setState(() => _unreadCount = count);
-          }
-        });
+      if (mounted) {
+        final count =
+            data.where((n) => n['is_read'] != true).length;
+        setState(() => _unreadCount = count);
+      }
+    });
   }
 
   void _go(BuildContext context, int index) {
@@ -104,28 +105,22 @@ class _CaregiverNavigationBarMobileState
               isLabelVisible: _unreadCount > 0,
               backgroundColor: Colors.red,
               label: _unreadCount > 9
-                  ? const Text(
-                      '9+',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
-                    )
-                  : Text(
-                      '$_unreadCount',
-                      style: const TextStyle(color: Colors.white, fontSize: 10),
-                    ),
+                  ? const Text('9+',
+                      style: TextStyle(color: Colors.white, fontSize: 10))
+                  : Text('$_unreadCount',
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 10)),
               child: const Icon(Icons.notifications_none_rounded),
             ),
             selectedIcon: Badge(
               isLabelVisible: _unreadCount > 0,
               backgroundColor: Colors.red,
               label: _unreadCount > 9
-                  ? const Text(
-                      '9+',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
-                    )
-                  : Text(
-                      '$_unreadCount',
-                      style: const TextStyle(color: Colors.white, fontSize: 10),
-                    ),
+                  ? const Text('9+',
+                      style: TextStyle(color: Colors.white, fontSize: 10))
+                  : Text('$_unreadCount',
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 10)),
               child: const Icon(Icons.notifications_rounded),
             ),
             label: 'Notifications',

@@ -2,7 +2,7 @@ name: carenest_mobileapp
 description: "CareNest - Caregiver booking platform for Sri Lanka"
 publish_to: "none"
 
-version: 1.0.0+1
+version: 1.0.3+4
 
 environment:
   sdk: ^3.10.7

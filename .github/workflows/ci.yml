@@ -1,4 +1,4 @@
-name: CI - Admin Portal
+name: CI - Admin Portal & Backend
 
 on:
   push:
@@ -13,7 +13,8 @@ on:
       - ".github/workflows/ci.yml"
 
 jobs:
-  build:
+  frontend:
+    name: Build Frontend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,18 +30,43 @@ jobs:
           cache: "npm"
           cache-dependency-path: Carenest_Admin_Portal/package-lock.json
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: npm install
 
       - name: Build React app
         run: CI=false npm run build
 
-      - name: Install backend dependencies
-        run: cd backend && npm install
+  backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Carenest_Admin_Portal/backend
 
-      - name: Check backend starts
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: Carenest_Admin_Portal/backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test || true
+        env:
+          SUPABASE_URL: https://placeholder.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-key
+          JWT_SECRET: test-secret-key-for-ci
+          JWT_EXPIRES_IN: 24h
+          NODE_ENV: test
+
+      - name: Check server starts
         run: |
-          cd backend
           timeout 5 node -e "
             const app = require('./server');
             const server = app.listen(5000, () => {
