@@ -64,4 +64,18 @@ void main() {
 
     expect(find.byIcon(Icons.arrow_back), findsOneWidget);
   });
+
+  /// ✅ TEST 4 — AppBar exists
+  testWidgets('Caregiver page has an AppBar',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: CaregiverDetailsPage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.byType(AppBar), findsOneWidget);
+  });
 }
