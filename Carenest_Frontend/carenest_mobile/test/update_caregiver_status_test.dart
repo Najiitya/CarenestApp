@@ -48,4 +48,18 @@ void main() {
 
     expect(find.text('Care Notes (Required)'), findsOneWidget);
   });
+
+  /// ✅ TEST 3
+  testWidgets('Payment confirmation checkbox is displayed',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: UpdateCareStatusPage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.byType(CheckboxListTile), findsOneWidget);
+  });
 }
