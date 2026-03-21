@@ -48,4 +48,18 @@ void main() {
 
     expect(find.byType(Scaffold), findsWidgets);
   });
+
+  /// ✅ TEST 3
+  testWidgets('Patient page contains text widgets',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PatientDetailsPage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.byType(Text), findsWidgets);
+  });
 }
