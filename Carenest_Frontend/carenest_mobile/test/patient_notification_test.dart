@@ -48,4 +48,18 @@ void main() {
 
     expect(find.text('No notifications yet'), findsOneWidget);
   });
+
+  /// ✅ TEST 3
+  testWidgets('Empty state shows notification icon',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PatientNotificationsPage(),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.notifications_none), findsOneWidget);
+  });
 }
