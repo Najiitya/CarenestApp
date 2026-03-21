@@ -48,4 +48,18 @@ void main() {
 
     expect(find.text('Service Type'), findsOneWidget);
   });
+
+  /// ✅ TEST 3
+  testWidgets('Request button is displayed',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: RequestCarePage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.text('Request'), findsOneWidget);
+  });
 }
