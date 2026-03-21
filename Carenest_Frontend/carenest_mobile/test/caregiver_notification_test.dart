@@ -8,7 +8,6 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    // Mock shared_preferences
     const MethodChannel channel =
         MethodChannel('plugins.flutter.io/shared_preferences');
 
@@ -16,7 +15,6 @@ void main() {
       return {};
     });
 
-    // Init Supabase
     await Supabase.initialize(
       url: 'https://xyzcompany.supabase.co',
       anonKey: 'public-anon-key',
@@ -35,5 +33,19 @@ void main() {
     await tester.pump();
 
     expect(find.text('Notifications'), findsWidgets);
+  });
+
+  /// ✅ TEST 2
+  testWidgets('Shows empty state when no notifications',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: CaregiverNotificationsPage(),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('No notifications yet'), findsOneWidget);
   });
 }
