@@ -8,7 +8,6 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    // Mock shared_preferences (fix plugin error)
     const MethodChannel channel =
         MethodChannel('plugins.flutter.io/shared_preferences');
 
@@ -16,7 +15,6 @@ void main() {
       return {};
     });
 
-    // Initialize Supabase (fake values)
     await Supabase.initialize(
       url: 'https://xyzcompany.supabase.co',
       anonKey: 'public-anon-key',
@@ -49,5 +47,19 @@ void main() {
     await tester.pump();
 
     expect(find.byType(Scaffold), findsOneWidget);
+  });
+
+  // ✅ TEST 3
+  testWidgets('Text widgets exist in patient details page',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PatientDetailsPage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.byType(Text), findsWidgets);
   });
 }
