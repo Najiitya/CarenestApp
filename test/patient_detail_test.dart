@@ -62,4 +62,18 @@ void main() {
 
     expect(find.byType(Text), findsWidgets);
   });
+
+  // ✅ TEST 4 (FINAL)
+  testWidgets('Page remains stable after short delay',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PatientDetailsPage(),
+      ),
+    );
+
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(find.byType(Scaffold), findsOneWidget);
+  });
 }
