@@ -8,15 +8,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    // Mock shared_preferences
     const MethodChannel channel =
         MethodChannel('plugins.flutter.io/shared_preferences');
 
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
       return {};
+
     });
 
-    // Init Supabase
     await Supabase.initialize(
       url: 'https://xyzcompany.supabase.co',
       anonKey: 'public-anon-key',
@@ -35,5 +34,19 @@ void main() {
     await tester.pump();
 
     expect(find.byType(MaterialApp), findsOneWidget);
+  });
+
+  /// ✅ TEST 2
+  testWidgets('Shows "Caregiver not found" when no data',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: CaregiverDetailsPage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.text('Caregiver not found'), findsOneWidget);
   });
 }
