@@ -62,4 +62,19 @@ void main() {
 
     expect(find.text('Request'), findsOneWidget);
   });
+
+  /// ✅ TEST 4
+  testWidgets('AppBar and back button are present',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: RequestCarePage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+  });
 }
