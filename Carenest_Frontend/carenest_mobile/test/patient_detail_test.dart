@@ -21,6 +21,7 @@ void main() {
     );
   });
 
+  /// ✅ TEST 1
   testWidgets('Patient page builds without crashing',
       (WidgetTester tester) async {
     await tester.pumpWidget(
@@ -32,5 +33,19 @@ void main() {
     await tester.pump();
 
     expect(find.byType(MaterialApp), findsOneWidget);
+  });
+
+  /// ✅ TEST 2
+  testWidgets('Scaffold is present on patient page',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PatientDetailsPage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.byType(Scaffold), findsWidgets);
   });
 }
