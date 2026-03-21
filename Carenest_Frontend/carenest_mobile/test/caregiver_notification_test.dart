@@ -62,4 +62,18 @@ void main() {
 
     expect(find.byIcon(Icons.notifications_none), findsOneWidget);
   });
+
+  /// ✅ TEST 4
+  testWidgets('Caregiver notifications page has an AppBar',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: CaregiverNotificationsPage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.byType(AppBar), findsOneWidget);
+  });
 }
