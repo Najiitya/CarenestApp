@@ -62,4 +62,18 @@ void main() {
 
     expect(find.byType(CheckboxListTile), findsOneWidget);
   });
+
+  /// ✅ TEST 4
+  testWidgets('Complete session button is displayed',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: UpdateCareStatusPage(),
+      ),
+    );
+
+    await tester.pump();
+
+    expect(find.textContaining('Complete Session'), findsWidgets);
+  });
 }
