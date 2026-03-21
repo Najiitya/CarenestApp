@@ -21,7 +21,7 @@ void main() {
     );
   });
 
-  /// ✅ TEST 1 (FIXED AGAIN 😏)
+  /// ✅ TEST 1
   testWidgets('Notifications page builds and shows title',
       (WidgetTester tester) async {
     await tester.pumpWidget(
@@ -33,5 +33,19 @@ void main() {
     await tester.pump();
 
     expect(find.text('Notifications'), findsWidgets);
+  });
+
+  /// ✅ TEST 2
+  testWidgets('Shows empty state when no notifications',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PatientNotificationsPage(),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('No notifications yet'), findsOneWidget);
   });
 }
