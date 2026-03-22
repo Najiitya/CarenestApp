@@ -1,0 +1,119 @@
+{
+  "info": {
+    "name": "CareNest Admin - Auth & Health",
+    "description": "Test collection for Auth and Health Check endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has status ok', function () { pm.expect(pm.response.json().status).to.eql('ok'); });",
+                  "pm.test('Response has timestamp', function () { pm.expect(pm.response.json().timestamp).to.be.a('string'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/health" }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /api/auth/login - valid credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has token', function () { const json = pm.response.json(); pm.expect(json.token).to.be.a('string'); pm.collectionVariables.set('token', json.token); });",
+                  "pm.test('Response success is true', function () { pm.expect(pm.response.json().success).to.be.true; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\": \"admin@carenest.lk\", \"password\": \"Admin@1234\"}" },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "POST /api/auth/login - wrong password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Response success is false', function () { pm.expect(pm.response.json().success).to.be.false; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\": \"admin@carenest.lk\", \"password\": \"wrongpassword\"}" },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "POST /api/auth/login - missing fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 or 401', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });",
+                  "pm.test('Response success is false', function () { pm.expect(pm.response.json().success).to.be.false; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\": \"\"}" },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "GET protected route - no token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/dashboard/stats" }
+        }
+      ]
+    }
+  ]
+}
