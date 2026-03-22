@@ -1,0 +1,171 @@
+{
+  "info": {
+    "name": "CareNest Admin - Dashboard & Caregivers",
+    "description": "Test collection for Dashboard and Caregiver Application endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "GET /api/dashboard/stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has all stat fields', function () { const d = pm.response.json().data; pm.expect(d).to.have.property('pendingApplications'); pm.expect(d).to.have.property('totalBookings'); pm.expect(d).to.have.property('totalUsers'); pm.expect(d).to.have.property('activeCaregivers'); });",
+                  "pm.test('Stat values are numbers', function () { const d = pm.response.json().data; pm.expect(d.pendingApplications).to.be.a('number'); pm.expect(d.totalBookings).to.be.a('number'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/dashboard/stats"
+          }
+        },
+        {
+          "name": "GET /api/dashboard/recent-applications",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response data is an array', function () { pm.expect(pm.response.json().data).to.be.an('array'); });",
+                  "pm.test('Max 10 results returned', function () { pm.expect(pm.response.json().data.length).to.be.at.most(10); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/dashboard/recent-applications"
+          }
+        },
+        {
+          "name": "GET /api/dashboard/recent-bookings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response data is an array', function () { pm.expect(pm.response.json().data).to.be.an('array'); });",
+                  "pm.test('Max 10 results returned', function () { pm.expect(pm.response.json().data.length).to.be.at.most(10); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/dashboard/recent-bookings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Caregiver Applications",
+      "item": [
+        {
+          "name": "GET /api/caregivers/applications - all",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response data is an array', function () { pm.expect(pm.response.json().data).to.be.an('array'); });",
+                  "pm.test('Response success is true', function () { pm.expect(pm.response.json().success).to.be.true; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/caregivers/applications"
+          }
+        },
+        {
+          "name": "GET /api/caregivers/applications - filter Pending",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('All results are Pending', function () { pm.response.json().data.forEach(function(app) { pm.expect(app.status).to.eql('Pending'); }); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/caregivers/applications?status=Pending", "query": [{ "key": "status", "value": "Pending" }] }
+          }
+        },
+        {
+          "name": "GET /api/caregivers/applications/:id - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+                  "pm.test('Response success is false', function () { pm.expect(pm.response.json().success).to.be.false; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/caregivers/applications/999999"
+          }
+        },
+        {
+          "name": "PATCH /api/caregivers/applications/:id/reject - missing reason",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                  "pm.test('Response success is false', function () { pm.expect(pm.response.json().success).to.be.false; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"reason\": \"\"}" },
+            "url": "{{baseUrl}}/api/caregivers/applications/1/reject"
+          }
+        }
+      ]
+    }
+  ]
+}
