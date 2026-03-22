@@ -770,41 +770,41 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
             Row(
               children: [
                 Expanded(
-                  child: SizedBox(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        if (bookingId.isNotEmpty) {
-                          _cancelVisitConfirmation(bookingId);
-                        }
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.redAccent,
-                        side: const BorderSide(color: Colors.redAccent),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14)),
-                      ),
-                      child: const Text('Cancel',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: OutlinedButton(
+                    onPressed: () {
+                      if (bookingId.isNotEmpty) {
+                        _cancelVisitConfirmation(bookingId);
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.redAccent,
+                      side: const BorderSide(color: Colors.redAccent),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
                     ),
+                    child: const Text('Cancel',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   flex: 2,
-                  child: SizedBox(
-                    child: ElevatedButton(
-                      onPressed: () => _startVisit(visit),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _primary,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14)),
-                      ),
-                      child: const Text('Start visit',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w900, fontSize: 15)),
+                  child: ElevatedButton(
+                    onPressed: () => _startVisit(visit),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
                     ),
+                    child: const Text('Start visit',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900, fontSize: 15)),
                   ),
                 ),
               ],
