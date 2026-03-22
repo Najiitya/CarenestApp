@@ -400,7 +400,7 @@ class _PatientProfilePageState extends State<PatientProfilePage> {
           backgroundColor: AppTheme.primary,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pushReplacementNamed(context, '/patient_dashboard'),
           ),
         ),
         body: const Center(child: Text('Profile not found')),
@@ -436,7 +436,7 @@ class _PatientProfilePageState extends State<PatientProfilePage> {
             backgroundColor: AppTheme.primary,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pushReplacementNamed(context, '/patient_dashboard'),
             ),
             actions: [
               IconButton(

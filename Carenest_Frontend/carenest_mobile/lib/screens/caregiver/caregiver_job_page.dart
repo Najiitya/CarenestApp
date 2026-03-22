@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/app_theme.dart';
 import '../../../widgets/caregiver_navigationbar_mobile.dart';
 
@@ -193,9 +194,13 @@ class _CaregiverJobRequestsPageState extends State<CaregiverJobRequestsPage> {
     final patientName = patientData['name'] ?? 'Unknown Patient';
     final age = patientData['age']?.toString() ?? 'N/A';
     final location = request['location'] ?? patientData['address'] ?? 'Location not provided';
+    final address = request['address'] ?? '';
     final serviceType = request['service_type'] ?? 'Visit';
     final date = request['date'] ?? '';
     final timeSlot = request['time_slot'] ?? '${request['start_time']} - ${request['end_time']}';
+    final hospitalName = request['hospital_name'] ?? '';
+    final wardNumber = request['ward_number'] ?? '';
+    final bedNumber = request['bed_number'] ?? '';
 
     final patientId = request['patient_id'];
 
@@ -314,6 +319,94 @@ class _CaregiverJobRequestsPageState extends State<CaregiverJobRequestsPage> {
               ),
             ],
           ),
+
+          if (address.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.my_location, size: 18, color: AppTheme.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    address,
+                    style: AppTheme.bodyText,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final query = Uri.encodeComponent(address);
+                  final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$query');
+                  try {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } catch (_) {
+                    await launchUrl(url, mode: LaunchMode.platformDefault);
+                  }
+                },
+                icon: const Icon(Icons.map, size: 16),
+                label: const Text('Open in Google Maps'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.primary,
+                  side: const BorderSide(color: AppTheme.primary),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+          ],
+
+          if (serviceType == 'Hospital' && hospitalName.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.softGreen.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.local_hospital, size: 16, color: AppTheme.primary),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          hospitalName,
+                          style: AppTheme.bodyText.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (wardNumber.isNotEmpty || bedNumber.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        if (wardNumber.isNotEmpty) ...[
+                          const Icon(Icons.meeting_room, size: 14, color: AppTheme.textGrey),
+                          const SizedBox(width: 4),
+                          Text('Ward: $wardNumber', style: AppTheme.bodyText.copyWith(fontSize: 13)),
+                          const SizedBox(width: 12),
+                        ],
+                        if (bedNumber.isNotEmpty) ...[
+                          const Icon(Icons.bed, size: 14, color: AppTheme.textGrey),
+                          const SizedBox(width: 4),
+                          Text('Bed: $bedNumber', style: AppTheme.bodyText.copyWith(fontSize: 13)),
+                        ],
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
 
           const SizedBox(height: 20),
 
