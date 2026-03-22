@@ -223,7 +223,7 @@ class _CaregiverProfilePageState extends State<CaregiverProfilePage> {
           backgroundColor: AppTheme.primary,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pushReplacementNamed(context, '/caregiver_dashboard'),
           ),
         ),
         body: const Center(child: Text('Profile not found')),
@@ -258,7 +258,7 @@ class _CaregiverProfilePageState extends State<CaregiverProfilePage> {
             backgroundColor: AppTheme.primary,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pushReplacementNamed(context, '/caregiver_dashboard'),
             ),
             actions: [
               IconButton(
