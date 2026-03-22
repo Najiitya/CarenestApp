@@ -137,7 +137,9 @@ class _CareReceiverDashboardPageState extends State<CareReceiverDashboardPage> {
           int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
       final endMinutes =
           int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
-      final diff = (endMinutes - startMinutes) / 60.0;
+      var adjustedEnd = endMinutes;
+      if (adjustedEnd <= startMinutes) adjustedEnd += 1440; // overnight
+      final diff = (adjustedEnd - startMinutes) / 60.0;
       return diff > 0 ? diff : 1;
     } catch (_) {
       return 1;
