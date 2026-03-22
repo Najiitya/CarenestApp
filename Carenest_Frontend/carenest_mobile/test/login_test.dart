@@ -61,5 +61,21 @@ void main() {
       // If the tap succeeds without crashing, the UI state updated successfully.
       expect(textFields, findsWidgets);
     });
+
+        testWidgets('TC_UI_03 Tapping "Sign Up" navigates to the role selection screen', (WidgetTester tester) async {
+      await tester.pumpWidget(createLoginScreen());
+
+      // Find the Sign Up text and tap it
+      final signUpText = find.text('Sign Up');
+      await tester.tap(signUpText);
+
+      // pumpAndSettle waits for the navigation animation to completely finish
+      await tester.pumpAndSettle();
+
+      // Verify that the app successfully pushed the '/role_select' route
+      expect(find.text('Role Select Page'), findsOneWidget);
+      expect(find.text('Login'), findsNothing); // Ensure we left the login screen
+    });
+    
   });
 }
