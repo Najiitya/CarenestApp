@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/caregiver_navigationbar_mobile.dart';
 
 class CaregiverDashboardPage extends StatefulWidget {
@@ -61,7 +62,9 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
           int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
       final endMinutes =
           int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
-      final diff = (endMinutes - startMinutes) / 60.0;
+      var adjustedEnd = endMinutes;
+      if (adjustedEnd <= startMinutes) adjustedEnd += 1440; // overnight
+      final diff = (adjustedEnd - startMinutes) / 60.0;
       return diff > 0 ? diff : 1; // at least 1 hour
     } catch (_) {
       return 1;
@@ -521,6 +524,11 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
     final patientName = visit['patient_profiles']?['name'] ?? 'Patient';
     final location =
         visit['patient_profiles']?['location'] ?? visit['location'] ?? '';
+    final address = visit['address'] ?? '';
+    final serviceType = visit['service_type'] ?? '';
+    final hospitalName = visit['hospital_name'] ?? '';
+    final wardNumber = visit['ward_number'] ?? '';
+    final bedNumber = visit['bed_number'] ?? '';
     final date = visit['date'] ?? '';
     final startTime = visit['start_time'] ?? '';
     final endTime = visit['end_time'] ?? '';
@@ -659,6 +667,74 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
               ),
             ],
           ),
+
+          if (address.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.my_location, size: 16, color: Color(0xFFA9C2BE)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(address,
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFA9C2BE))),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final query = Uri.encodeComponent(address);
+                  final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$query');
+                  try {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } catch (_) {
+                    await launchUrl(url, mode: LaunchMode.platformDefault);
+                  }
+                },
+                icon: const Icon(Icons.map, size: 14, color: Colors.white70),
+                label: const Text('Open in Google Maps',
+                    style: TextStyle(fontSize: 12, color: Colors.white70)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.white24),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+          ],
+
+          if (serviceType == 'Hospital' && hospitalName.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.local_hospital, size: 14, color: Colors.white70),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      '$hospitalName${wardNumber.isNotEmpty ? ' | Ward: $wardNumber' : ''}${bedNumber.isNotEmpty ? ' | Bed: $bedNumber' : ''}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           const SizedBox(height: 16),
 
           if (status == 'Ongoing')
