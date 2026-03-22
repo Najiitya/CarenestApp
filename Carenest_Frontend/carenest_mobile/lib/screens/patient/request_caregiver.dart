@@ -548,7 +548,9 @@ class _RequestCarePageState extends State<RequestCarePage> {
                 controller: _addressController,
                 maxLines: 2,
                 decoration: const InputDecoration(
-                  hintText: 'Enter the full address for the caregiver',
+                  hintText: 'Copy address from Google Maps and paste here',
+                  helperText: 'Open Google Maps → long press location → copy address',
+                  helperMaxLines: 2,
                 ),
               ),
             ),
