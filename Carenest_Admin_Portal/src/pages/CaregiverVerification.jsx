@@ -1,3 +1,4 @@
+import carenestLogo from "../assets/carenest_logo.png";
 import { useState, useEffect } from "react";
 import {
   Avatar,
@@ -320,7 +321,7 @@ function CaregiverVerification() {
                           <TableCell sx={{ py: 2, borderBottom: "1px solid #f5f5f5" }}>
                             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                               <Avatar
-                                src={`https://i.pravatar.cc/36?img=${i + 10}`}
+                                src={carenestLogo} sx={{ bgcolor: "#16A394" }}
                                 sx={{ width: 36, height: 36 }}
                               />
                               <Box>
@@ -429,7 +430,7 @@ function CaregiverVerification() {
               }}
             >
               <Avatar
-                src={`https://i.pravatar.cc/56?img=${applications.findIndex((a) => a.id === selectedCaregiver.id) + 10}`}
+                src={carenestLogo} sx={{ bgcolor: "#16A394" }}
                 sx={{ width: 56, height: 56, border: "3px solid rgba(255,255,255,0.3)" }}
               />
               <Box sx={{ flex: 1 }}>
