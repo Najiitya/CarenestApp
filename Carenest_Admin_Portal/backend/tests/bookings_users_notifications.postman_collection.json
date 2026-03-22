@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "CareNest Admin - Bookings, Users & Notifications",
+    "description": "Test collection for Bookings, Users and Notifications endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "GET /api/bookings - all",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response data is an array', function () { pm.expect(pm.response.json().data).to.be.an('array'); });",
+                  "pm.test('Each booking has required fields', function () { const data = pm.response.json().data; if (data.length > 0) { pm.expect(data[0]).to.have.property('id'); pm.expect(data[0]).to.have.property('status'); pm.expect(data[0]).to.have.property('serviceType'); } });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/bookings"
+          }
+        },
+        {
+          "name": "GET /api/bookings - filter by Pending",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('All results have Pending status', function () { pm.response.json().data.forEach(function(b) { pm.expect(b.status).to.eql('Pending'); }); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/bookings?status=Pending", "query": [{ "key": "status", "value": "Pending" }] }
+          }
+        },
+        {
+          "name": "GET /api/bookings/:id - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+                  "pm.test('Response success is false', function () { pm.expect(pm.response.json().success).to.be.false; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/bookings/BK-0000000000000"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /api/users - all",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response data is an array', function () { pm.expect(pm.response.json().data).to.be.an('array'); });",
+                  "pm.test('Each user has role field', function () { const data = pm.response.json().data; if (data.length > 0) { pm.expect(data[0]).to.have.property('role'); } });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "GET /api/users/:id - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+                  "pm.test('Response success is false', function () { pm.expect(pm.response.json().success).to.be.false; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/users/999999"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "GET /api/notifications/activity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response data is an array', function () { pm.expect(pm.response.json().data).to.be.an('array'); });",
+                  "pm.test('Response success is true', function () { pm.expect(pm.response.json().success).to.be.true; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/notifications/activity"
+          }
+        }
+      ]
+    }
+  ]
+}
