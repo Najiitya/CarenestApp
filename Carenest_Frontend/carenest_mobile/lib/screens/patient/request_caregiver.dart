@@ -27,6 +27,10 @@ class _RequestCarePageState extends State<RequestCarePage> {
   String _caregiverName = '';
 
   final TextEditingController notesController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _hospitalNameController = TextEditingController();
+  final TextEditingController _wardNumberController = TextEditingController();
+  final TextEditingController _bedNumberController = TextEditingController();
 
   final List<String> serviceTypes = ['Home Visit', 'Hospital'];
 
@@ -49,6 +53,10 @@ class _RequestCarePageState extends State<RequestCarePage> {
   @override
   void dispose() {
     notesController.dispose();
+    _addressController.dispose();
+    _hospitalNameController.dispose();
+    _wardNumberController.dispose();
+    _bedNumberController.dispose();
     super.dispose();
   }
 
@@ -91,9 +99,9 @@ class _RequestCarePageState extends State<RequestCarePage> {
   double get _estimatedPayment {
     if (startTime == null || endTime == null || _hourlyRate == 0) return 0;
     final startMinutes = startTime!.hour * 60 + startTime!.minute;
-    final endMinutes = endTime!.hour * 60 + endTime!.minute;
+    var endMinutes = endTime!.hour * 60 + endTime!.minute;
+    if (endMinutes <= startMinutes) endMinutes += 1440; // overnight: add 24h
     final diffMinutes = endMinutes - startMinutes;
-    if (diffMinutes <= 0) return 0;
     final hours = diffMinutes / 60.0;
     return hours * _hourlyRate;
   }
@@ -101,9 +109,9 @@ class _RequestCarePageState extends State<RequestCarePage> {
   double get _estimatedHours {
     if (startTime == null || endTime == null) return 0;
     final startMinutes = startTime!.hour * 60 + startTime!.minute;
-    final endMinutes = endTime!.hour * 60 + endTime!.minute;
+    var endMinutes = endTime!.hour * 60 + endTime!.minute;
+    if (endMinutes <= startMinutes) endMinutes += 1440; // overnight: add 24h
     final diffMinutes = endMinutes - startMinutes;
-    if (diffMinutes <= 0) return 0;
     return diffMinutes / 60.0;
   }
 
@@ -169,9 +177,21 @@ class _RequestCarePageState extends State<RequestCarePage> {
         selectedDate == null ||
         startTime == null ||
         endTime == null ||
-        _selectedLocation == null) {
+        _selectedLocation == null ||
+        _addressController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    if (serviceType == 'Hospital' &&
+        _hospitalNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter the hospital name'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -214,7 +234,13 @@ class _RequestCarePageState extends State<RequestCarePage> {
         'time_slot':
             '${startTime!.format(context)} - ${endTime!.format(context)}',
         'location': _selectedLocation,
+        'address': _addressController.text.trim(),
         'description': notesController.text.trim(),
+        if (serviceType == 'Hospital') ...{
+          'hospital_name': _hospitalNameController.text.trim(),
+          'ward_number': _wardNumberController.text.trim(),
+          'bed_number': _bedNumberController.text.trim(),
+        },
       });
 
       // Send notification to caregiver
@@ -513,6 +539,64 @@ class _RequestCarePageState extends State<RequestCarePage> {
               ),
             ),
             const SizedBox(height: 16),
+
+            // Full Address
+            buildCard(
+              icon: Icons.my_location,
+              title: 'Full Address',
+              child: TextFormField(
+                controller: _addressController,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                  hintText: 'Enter the full address for the caregiver',
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Hospital Details (only when Hospital is selected)
+            if (serviceType == 'Hospital') ...[
+              buildCard(
+                icon: Icons.local_hospital,
+                title: 'Hospital Details',
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _hospitalNameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Hospital Name',
+                        prefixIcon: Icon(Icons.local_hospital_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _wardNumberController,
+                            decoration: const InputDecoration(
+                              hintText: 'Ward No',
+                              prefixIcon: Icon(Icons.meeting_room),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _bedNumberController,
+                            decoration: const InputDecoration(
+                              hintText: 'Bed No',
+                              prefixIcon: Icon(Icons.bed),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             // Notes
             buildCard(
